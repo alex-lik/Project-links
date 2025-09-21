@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Admin{% endblock %}
+
+{% block content %}
+    <div class="min-h-screen py-6" style="background-color: var(--background-color);">
+        <div class="max-w-4xl mx-auto px-4">
+            <h1 class="text-3xl font-bold text-center mb-8">Admin</h1>
+
+            <!-- Settings -->
+            <div class="shadow-md rounded-lg p-6 mb-8" style="background-color: var(--background-color);">
+                <h2 class="text-2xl font-semibold mb-4">Settings</h2>
+                <form method="post" class="space-y-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div>
+                        <label for="title" class="block text-sm font-medium " style="color: var(--text-color);">Title:</label>
+                        <input type="text" id="title" name="title" value="{{ data.settings.title }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="logo" class="block text-sm font-medium " style="color: var(--text-color);">Logo (URL):</label>
+                        <input type="text" id="logo" name="logo" value="{{ data.settings.logo }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label for="primary_color" class="block text-sm font-medium " style="color: var(--text-color);">Primary Color:</label>
+                            <input type="color" id="primary_color" name="primary_color" value="{{ data.settings.primary_color }}" class="mt-1 block w-full h-10 border border-gray-300 rounded-md" onchange="updateHex('primary_color')">
+                            <input type="text" id="primary_color_hex" value="{{ data.settings.primary_color }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" readonly onclick="copyToClipboard('primary_color_hex')">
+                        </div>
+                        <div>
+                            <label for="hover_color" class="block text-sm font-medium " style="color: var(--text-color);">Hover Color:</label>
+                            <input type="color" id="hover_color" name="hover_color" value="{{ data.settings.hover_color }}" class="mt-1 block w-full h-10 border border-gray-300 rounded-md" onchange="updateHex('hover_color')">
+                            <input type="text" id="hover_color_hex" value="{{ data.settings.hover_color }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" readonly onclick="copyToClipboard('hover_color_hex')">
+                        </div>
+                        <div>
+                            <label for="background_color" class="block text-sm font-medium " style="color: var(--text-color);">Background Color:</label>
+                            <input type="color" id="background_color" name="background_color" value="{{ data.settings.background_color }}" class="mt-1 block w-full h-10 border border-gray-300 rounded-md" onchange="updateHex('background_color')">
+                            <input type="text" id="background_color_hex" value="{{ data.settings.background_color }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" readonly onclick="copyToClipboard('background_color_hex')">
+                        </div>
+                        <div>
+                            <label for="navbar_color" class="block text-sm font-medium " style="color: var(--text-color);">Navbar Color:</label>
+                            <input type="color" id="navbar_color" name="navbar_color" value="{{ data.settings.navbar_color }}" class="mt-1 block w-full h-10 border border-gray-300 rounded-md" onchange="updateHex('navbar_color')">
+                            <input type="text" id="navbar_color_hex" value="{{ data.settings.navbar_color }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" readonly onclick="copyToClipboard('navbar_color_hex')">
+                        </div>
+                        <div>
+                            <label for="text_color" class="block text-sm font-medium " style="color: var(--text-color);">Text Color:</label>
+                            <input type="color" id="text_color" name="text_color" value="{{ data.settings.text_color }}" class="mt-1 block w-full h-10 border border-gray-300 rounded-md" onchange="updateHex('text_color')">
+                            <input type="text" id="text_color_hex" value="{{ data.settings.text_color }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" readonly onclick="copyToClipboard('text_color_hex')">
+                        </div>
+                        <div>
+                            <label for="default_group_background_color" class="block text-sm font-medium " style="color: var(--text-color);">Default Group Background Color:</label>
+                            <input type="color" id="default_group_background_color" name="default_group_background_color" value="{{ data.settings.default_group_background_color }}" class="mt-1 block w-full h-10 border border-gray-300 rounded-md" onchange="updateHex('default_group_background_color')">
+                            <input type="text" id="default_group_background_color_hex" value="{{ data.settings.default_group_background_color }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" readonly onclick="copyToClipboard('default_group_background_color_hex')">
+                        </div>
+                        <div>
+                            <label for="font_family" class="block text-sm font-medium " style="color: var(--text-color);">Font Family:</label>
+                            <select id="font_family" name="font_family" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="Arial, sans-serif" {% if data.settings.font_family == 'Arial, sans-serif' %}selected{% endif %}>Arial</option>
+                                <option value="Helvetica, sans-serif" {% if data.settings.font_family == 'Helvetica, sans-serif' %}selected{% endif %}>Helvetica</option>
+                                <option value="Times New Roman, serif" {% if data.settings.font_family == 'Times New Roman, serif' %}selected{% endif %}>Times New Roman</option>
+                                <option value="Georgia, serif" {% if data.settings.font_family == 'Georgia, serif' %}selected{% endif %}>Georgia</option>
+                                <option value="Verdana, sans-serif" {% if data.settings.font_family == 'Verdana, sans-serif' %}selected{% endif %}>Verdana</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" style="background-color: var(--primary-color); color: var(--text-color); font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem;">Save Settings</button>
+                </form>
+            </div>
+
+            <!-- Security -->
+            <div class="shadow-md rounded-lg p-6 mb-8" style="background-color: var(--background-color);">
+                <h2 class="text-2xl font-semibold mb-4">Security</h2>
+                <form method="post" action="{{ url_for('change_password') }}" class="space-y-4 mb-6">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <h3 class="text-xl font-semibold">Change Password</h3>
+                    <div>
+                        <label for="current_password" class="block text-sm font-medium " style="color: var(--text-color);">Current Password:</label>
+                        <input type="password" id="current_password" name="current_password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="new_password" class="block text-sm font-medium " style="color: var(--text-color);">New Password:</label>
+                        <input type="password" id="new_password" name="new_password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="confirm_password" class="block text-sm font-medium " style="color: var(--text-color);">Confirm New Password:</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <button type="submit" style="background-color: var(--primary-color); color: var(--text-color); font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem;">Change Password</button>
+                </form>
+                <form method="post" class="space-y-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <h3 class="text-xl font-semibold">Access Settings</h3>
+                    <div>
+                        <label for="auth_only" class="block text-sm font-medium " style="color: var(--text-color);">
+                            <input type="checkbox" id="auth_only" name="auth_only" {% if data.settings.auth_only %}checked{% endif %} class="mr-2">
+                            Site access only for authorized users
+                        </label>
+                    </div>
+                    <div>
+                        <label for="allowed_ips" class="block text-sm font-medium " style="color: var(--text-color);">Allowed IPs (comma-separated):</label>
+                        <input type="text" id="allowed_ips" name="allowed_ips" value="{{ data.settings.allowed_ips | join(', ') }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <button type="submit" style="background-color: var(--primary-color); color: var(--text-color); font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem;">Save Security Settings</button>
+                </form>
+            </div>
+
+            <!-- Add Group -->
+            <div class="shadow-md rounded-lg p-6 mb-8" style="background-color: var(--background-color);">
+                <h2 class="text-2xl font-semibold mb-4">Add Group</h2>
+                <form method="post" action="{{ url_for('add_group') }}" class="space-y-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div>
+                        <label for="group_name" class="block text-sm font-medium " style="color: var(--text-color);">Group Name:</label>
+                        <input type="text" id="group_name" name="name" placeholder="Group Name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="group_background_color" class="block text-sm font-medium " style="color: var(--text-color);">Group Background Color:</label>
+                        <input type="color" id="group_background_color" name="background_color" value="#ffffff" class="mt-1 block w-full h-10 border border-gray-300 rounded-md">
+                    </div>
+                    <button type="submit" style="background-color: var(--primary-color); color: var(--text-color); font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem;">Add</button>
+                </form>
+            </div>
+
+            <!-- Группы -->
+            {% for group in data.groups %}
+            {% set group_index = loop.index0 %}
+            <div class="shadow-md rounded-lg p-6 mb-8" style="background-color: var(--background-color);">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <span class="inline-block w-4 h-4 rounded mr-2" style="background-color: {{ group.background_color }};"></span>
+                        {{ group.name }}
+                    </h3>
+                    <div class="space-x-2">
+                        <button onclick="toggleEdit('group-{{ group_index }}')" style="background-color: var(--primary-color); color: var(--text-color); font-weight: bold; padding: 0.25rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem;">Edit</button>
+                        <a href="{{ url_for('delete_group', group_id=group_index) }}" style="background-color: #dc2626; color: var(--text-color); font-weight: bold; padding: 0.25rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; text-decoration: none;" onclick="return confirm('Delete group?')">Delete</a>
+                    </div>
+                </div>
+                <div id="group-{{ group_index }}" style="display: none;" class="mb-4 p-4 bg-gray-50 rounded">
+                    <form method="post" action="{{ url_for('edit_group', group_id=group_index) }}" class="space-y-4">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <div>
+                            <label class="block text-sm font-medium " style="color: var(--text-color);">Group Name:</label>
+                            <input type="text" name="name" value="{{ group.name }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium " style="color: var(--text-color);">Group Background Color:</label>
+                            <input type="color" name="background_color" value="{{ group.background_color }}" class="mt-1 block w-full h-10 border border-gray-300 rounded-md">
+                        </div>
+                        <button type="submit" style="background-color: var(--primary-color); color: var(--text-color); font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem;">Save</button>
+                    </form>
+                </div>
+                <ul class="space-y-2 mb-4">
+                    {% for link in group.links %}
+                    {% set link_index = loop.index0 %}
+                    <li class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span>{{ link.title }} ({{ link.url }})</span>
+                        <div class="space-x-2">
+                            <button onclick="toggleEdit('link-{{ group_index }}-{{ link_index }}')" style="background-color: var(--primary-color); color: var(--text-color); font-weight: bold; padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem;">Edit</button>
+                            <a href="{{ url_for('delete_link', group_id=group_index, link_id=link_index) }}" style="background-color: #dc2626; color: var(--text-color); font-weight: bold; padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; text-decoration: none;" onclick="return confirm('Delete link?')">Delete</a>
+                        </div>
+                    </li>
+                    <div id="link-{{ group_index }}-{{ link_index }}" style="display: none;" class="mt-2 p-4 bg-gray-100 rounded">
+                        <form method="post" action="{{ url_for('edit_link', group_id=group_index, link_id=link_index) }}" class="space-y-2">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <div>
+                                <label class="block text-sm font-medium " style="color: var(--text-color);">URL:</label>
+                                <input type="url" name="url" value="{{ link.url }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium " style="color: var(--text-color);">Title:</label>
+                                <input type="text" name="title" value="{{ link.title }}" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium " style="color: var(--text-color);">Description:</label>
+                                <input type="text" name="description" value="{{ link.description }}" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <button type="submit" style="background-color: var(--primary-color); color: var(--text-color); font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem;">Save</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </ul>
+                <form method="post" action="{{ url_for('add_link', group_id=group_index) }}" class="space-y-2">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div>
+                        <label class="block text-sm font-medium " style="color: var(--text-color);">URL:</label>
+                        <input type="url" name="url" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium " style="color: var(--text-color);">Title:</label>
+                        <input type="text" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium " style="color: var(--text-color);">Description:</label>
+                        <input type="text" name="description" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <button type="submit" style="background-color: var(--primary-color); color: var(--text-color); font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.375rem;">Add Link</button>
+                </form>
+            </div>
+            {% endfor %}
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+                        <ul>
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+    <script>
+        function toggleEdit(id) {
+            var element = document.getElementById(id);
+            if (element.style.display === "none") {
+                element.style.display = "block";
+            } else {
+                element.style.display = "none";
+            }
+        }
+        function updateHex(colorId) {
+            var colorInput = document.getElementById(colorId);
+            var hexInput = document.getElementById(colorId + '_hex');
+            hexInput.value = colorInput.value.toUpperCase();
+        }
+        function copyToClipboard(id) {
+            var copyText = document.getElementById(id);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            alert("Copied: " + copyText.value);
+        }
+    </script>
+{% endblock %}

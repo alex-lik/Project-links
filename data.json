@@ -1,0 +1,45 @@
+{
+  "settings": {
+    "title": "Project navi",
+    "logo": "",
+    "primary_color": "#0400ff",
+    "hover_color": "#fbff00",
+    "background_color": "#b5b5b5",
+    "navbar_color": "#3d4dc7",
+    "text_color": "#000000",
+    "font_family": "Verdana, sans-serif",
+    "default_group_background_color": "#ffffff",
+    "password_hash": "$2b$12$IAUOPSVdBtGuUm5TVJlej.FcOL0qBbPdXw8cxw1tv9FwDR4dVXrAq",
+    "auth_only": false,
+    "allowed_ips": [],
+    "csrf_secret": "0c68370325f751de0f0557e6be804a06fca861ba2710a47c22fa7518ffe82a99"
+  },
+  "groups": [
+    {
+      "name": "Search systems",
+      "links": [
+        {
+          "url": "https://google.com",
+          "title": "google",
+          "description": ""
+        },
+        {
+          "url": "https://www.bing.com/",
+          "title": "Bing",
+          "description": ""
+        },
+        {
+          "url": "https://search.yahoo.com/",
+          "title": "Yahoo Search ",
+          "description": ""
+        },
+        {
+          "url": "https://www.baidu.com/",
+          "title": "Baidu",
+          "description": ""
+        }
+      ],
+      "background_color": "#ffffff"
+    }
+  ]
+}

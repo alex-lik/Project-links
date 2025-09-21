@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.settings.title }}{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <div class="text-center py-12">
+        {% if data.settings.logo %}
+        <img src="{{ data.settings.logo }}" alt="Logo" class="mx-auto h-16 w-auto mb-4">
+        {% endif %}
+        <h1 class="text-4xl font-bold mb-4">{{ data.settings.title }}</h1>
+    </div>
+
+    <!-- Groups -->
+    <div class="space-y-12">
+        {% for group in data.groups %}
+        <div class="shadow-lg rounded-lg p-6" style="background-color: {{ group.background_color or data.settings.default_group_background_color }};">
+            <h2 class="text-2xl font-semibold mb-6 text-center">{{ group.name }}</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {% for link in group.links %}
+                <a href="{{ link.url }}" target="_blank" title="{{ link.description }}" class="link block p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 text-center" style="background-color: var(--primary-color); color: var(--text-color);">
+                    <div class="font-medium">{{ link.title }}</div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+{% endblock %}
