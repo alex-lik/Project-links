@@ -1,6 +1,6 @@
 # Project Links
 
-A Flask-based web application for managing and organizing collections of links grouped into categories. Features an admin panel for configuration, authentication, and security settings.
+A Flask-based web application for managing and organizing collections of links grouped into categories. Features an admin panel for configuration, authentication, and security settings. Supports deployment via Ansible with Docker or bare-metal options.
 
 ## Features
 
@@ -13,10 +13,22 @@ A Flask-based web application for managing and organizing collections of links g
   - Session timeout (30 minutes)
 - **Customization**: Configurable colors, fonts, logo, and UI themes
 - **Data Storage**: JSON-based storage for easy backup and portability
+- **Deployment**: Ansible playbooks for automated deployment with Docker or bare-metal
 
 ## Design Philosophy
 
 The project was intentionally designed to be as simple as possible, without a database. If you need database functionality, you can either implement it yourself or contact the author for paid customizations.
+
+## Project Structure
+
+- `app.py`: Main Flask application
+- `requirements.txt`: Python dependencies
+- `templates/`: Jinja2 templates
+- `static/`: Static assets
+- `data.json`: Application data storage
+- `app/`: Docker-related files (Dockerfile, docker-compose.yml)
+- `deploy/`: Ansible deployment files (inventory.yml, playbook.yml)
+- `.env`: Environment variables and secrets
 
 ## Installation
 
@@ -33,14 +45,32 @@ The project was intentionally designed to be as simple as possible, without a da
 
 ## Running the Application
 
+### Development
 Start the development server:
 ```bash
 python app.py
 ```
-
 The application will be available at `http://localhost:5000`
 
-### Default Credentials
+### Production Deployment
+
+#### Using Ansible
+1. Update `.env` with your secrets and server details
+2. Update `deploy/inventory.yml` if needed
+3. Set `use_docker: true` in `deploy/playbook.yml` for Docker deployment or `false` for bare-metal
+4. Run the playbook:
+   ```bash
+   cd deploy
+   ansible-playbook -i inventory.yml playbook.yml
+   ```
+
+#### Using Docker Compose
+```bash
+cd app
+docker-compose up -d
+```
+
+## Default Credentials
 - **Username**: admin
 - **Password**: admin (change after first login)
 
@@ -77,6 +107,11 @@ Key configuration options:
 - `allowed_ips`: List of allowed IP addresses
 - `primary_color`, `hover_color`, etc.: UI customization
 - `password_hash`: Hashed admin password
+
+Environment variables in `.env`:
+- `SECRET_KEY`: Flask secret key
+- `SERVER_IP`: Server IP for Ansible
+- `SERVER_USER`: SSH user for Ansible
 
 ## Contributing
 

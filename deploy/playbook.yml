@@ -1,0 +1,140 @@
+---
+- name: Deploy Project Links Application
+  hosts: webservers
+  become: yes
+  vars:
+    use_docker: true  # Set to false for bare-metal deployment
+    app_port: 8000
+    domain: your-domain.com
+    app_dir: /opt/project-links
+    venv_dir: "{{ app_dir }}/venv"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Install common packages
+      package:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+          - git
+          - curl
+          - wget
+        state: present
+
+    - name: Create app directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Clone or update application code
+      git:
+        repo: https://github.com/alex-lik/project-links.git
+        dest: "{{ app_dir }}"
+        version: main
+        update: yes
+
+    - name: Copy .env file
+      copy:
+        src: "{{ playbook_dir }}/../.env"
+        dest: "{{ app_dir }}/.env"
+        mode: '0600'
+
+    # Bare-metal deployment
+    - name: Deploy bare-metal
+      block:
+        - name: Install Python dependencies
+          pip:
+            requirements: "{{ app_dir }}/requirements.txt"
+            virtualenv: "{{ venv_dir }}"
+            virtualenv_python: python3
+
+        - name: Copy init script
+          copy:
+            content: |
+              #!/usr/bin/env python3
+              import json
+              import os
+              import secrets
+
+              DATA_FILE = 'data.json'
+
+              if os.path.exists(DATA_FILE):
+                  print(f"{DATA_FILE} already exists.")
+              else:
+                  default_data = {
+                      "settings": {
+                          "title": "Navigation",
+                          "logo": "",
+                          "primary_color": "#4CAF50",
+                          "hover_color": "#3e8e41",
+                          "background_color": "#f2f2f2",
+                          "default_group_background_color": "#ffffff",
+                          "password_hash": "",
+                          "auth_only": False,
+                          "allowed_ips": [],
+                          "csrf_secret": secrets.token_hex(32)
+                      },
+                      "groups": []
+                  }
+                  with open(DATA_FILE, 'w', encoding='utf-8') as f:
+                      json.dump(default_data, f, ensure_ascii=False, indent=2)
+                  print(f"Initialized {DATA_FILE}.")
+            dest: "{{ app_dir }}/init_data.py"
+            mode: '0755'
+
+        - name: Run init script
+          command: "{{ venv_dir }}/bin/python {{ app_dir }}/init_data.py"
+
+        - name: Copy systemd service
+          copy:
+            content: |
+              [Unit]
+              Description=Project Links Flask Application
+              After=network.target
+
+              [Service]
+              User={{ ansible_user }}
+              Group={{ ansible_user }}
+              WorkingDirectory={{ app_dir }}
+              Environment=PATH={{ venv_dir }}/bin
+              ExecStart={{ venv_dir }}/bin/gunicorn --bind 0.0.0.0:{{ app_port }} app:app
+              Restart=always
+
+              [Install]
+              WantedBy=multi-user.target
+            dest: /etc/systemd/system/project-links.service
+
+        - name: Reload systemd
+          systemd:
+            daemon_reload: yes
+
+        - name: Enable and start app service
+          service:
+            name: project-links
+            state: started
+            enabled: yes
+      when: not use_docker
+
+    # Docker deployment
+    - name: Deploy Docker
+      block:
+        - name: Pull latest code
+          git:
+            repo: https://github.com/alex-lik/project-links.git
+            dest: "{{ app_dir }}"
+            version: main
+            update: yes
+
+        - name: Start Docker containers
+          docker_compose:
+            project_src: "{{ app_dir }}"
+            state: present
+            remove_orphans: yes
+      when: use_docker
